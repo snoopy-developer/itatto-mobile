@@ -1,28 +1,23 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "jsx": "react",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@components/*": [
-        "./components/*"
-      ],
-      "@screens/*": [
-        "./screens/*"
-      ],
-      "@assets/*": [
-        "./assets/*"
-      ],
-      "@utils/*": [
-        "./utils/*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@screens/*": ["./screens/*"],
+      "@assets/*": ["./assets/*"],
+      "@utils/*": ["./utils/*"]
     },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./declarations.d.ts"
-    ]
+    "typeRoots": ["./node_modules/@types", "./declarations.d.ts"]
   },
   "include": [
     "**/*.ts",
@@ -30,5 +25,6 @@
     "lang/i18n.js",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+  ],
+  "exclude": ["node_modules"]
 }
