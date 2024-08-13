@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import InputField from '@/components/InputField';
 import ToggleButton from '@/components/ToggleButton';
@@ -68,7 +62,7 @@ const SignInScreen: React.FC = () => {
   };
 
   const handleSignUp = () => {
-    router.push('/singUp');
+    router.push('/signUp');
   };
 
   return (

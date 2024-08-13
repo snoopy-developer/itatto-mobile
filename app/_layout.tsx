@@ -1,17 +1,17 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { ThemeProvider } from '@react-navigation/native';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import React from 'react';
 import { store } from '@/redux/store';
 import { Provider } from 'react-redux';
 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { CustomThemeProvider, useCustomTheme } from '@/modules/theme-context';
 import { lightTheme, darkTheme } from '@/themes/themes';
 
 export {
@@ -51,24 +51,35 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <CustomThemeProvider>
+      <RootLayoutNav />
+    </CustomThemeProvider>
+  );
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+  const { theme } = useCustomTheme();
+
+  const [currentTheme, setCurrentTheme] = useState(
+    theme === 'dark' ? lightTheme : darkTheme,
+  );
+
+  useEffect(() => {
+    setCurrentTheme(theme === 'dark' ? lightTheme : darkTheme);
+  }, [theme]);
 
   return (
-    <StyledThemeProvider theme={theme}>
-      <Provider store={store}>
-        <ThemeProvider value={theme}>
+    <SafeAreaProvider>
+      <StyledThemeProvider theme={currentTheme}>
+        <Provider store={store}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(homeMenu)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
-        </ThemeProvider>
-      </Provider>
-    </StyledThemeProvider>
+        </Provider>
+      </StyledThemeProvider>
+    </SafeAreaProvider>
   );
 }
