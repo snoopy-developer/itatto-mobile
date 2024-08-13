@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import InputField from '@/components/InputField';
 import ToggleButton from '@/components/ToggleButton';
 import { SansText } from '@/components/StyledText';
 import { useTheme } from 'styled-components/native';
-import { validateForm } from '@/helpers/authHelper';
-import { handleUserLoginResponse } from '@/modules/userActions';
+import { validateEmail } from '@/helpers/authHelper';
+import {
+  handleUserLoginResponse,
+  handleUserProfileFetch,
+} from '@/modules/userActions';
 import { useRouter } from 'expo-router';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { screenDefaultHeight } from '@/constants/Params';
+import { AppDispatch } from '@/redux/store';
+import { useDispatch } from 'react-redux';
 
 const SignInScreen: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -18,16 +31,14 @@ const SignInScreen: React.FC = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const theme = useTheme();
   const styles = createStylesheet(theme);
 
   const handleSignIn = () => {
-    const { emailError, passwordError } = validateForm(email, password);
-
-    if (emailError || passwordError) {
-      setEmailError(emailError);
-      setPasswordError(passwordError);
+    if (!validateEmail(email)) {
+      setEmailError('The email must be a valid email address.');
       return;
     }
 
@@ -42,17 +53,22 @@ const SignInScreen: React.FC = () => {
         setEmailError(null);
         setPasswordError(null);
 
-        console.log('Response:', response);
-
-        handleUserLoginResponse(response);
-
-        router.push('/');
+        handleUserLoginResponse(response).finally(() => {
+          handleUserProfileFetch(dispatch, router);
+        });
       })
       .catch((error: any) => {
         console.log('error:', error);
-        setEmailError('Invalid email or password');
-        setPasswordError('Invalid email or password');
+        setEmailError('Invalid email or password.');
       });
+  };
+
+  const handleRecoverPassword = () => {
+    router.push('/passwordRecovery');
+  };
+
+  const handleSignUp = () => {
+    router.push('/singUp');
   };
 
   return (
@@ -83,7 +99,7 @@ const SignInScreen: React.FC = () => {
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <FontAwesome
               name={showPassword ? 'eye' : 'eye-slash'}
-              size={20}
+              size={RFValue(20, screenDefaultHeight)}
               color={theme.colors.textDisabled}
             />
           </TouchableOpacity>
@@ -95,7 +111,10 @@ const SignInScreen: React.FC = () => {
         errorMessage={passwordError}
       />
 
-      <TouchableOpacity style={styles.forgotPassword}>
+      <TouchableOpacity
+        style={styles.forgotPassword}
+        onPress={handleRecoverPassword}
+      >
         <SansText style={styles.forgotPasswordText}>Forgot password?</SansText>
       </TouchableOpacity>
 
@@ -107,7 +126,7 @@ const SignInScreen: React.FC = () => {
         <SansText style={styles.signUpText}>
           Don't have an account yet?
         </SansText>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSignUp}>
           <SansText style={styles.signUpLink}>Sign up?</SansText>
         </TouchableOpacity>
       </View>
@@ -154,7 +173,7 @@ const createStylesheet = (theme: any) =>
       color: theme.colors.grayLight,
     },
     inputContainer: {
-      marginBottom: 15,
+      marginBottom: 0,
     },
     forgotPassword: {
       alignItems: 'flex-end',

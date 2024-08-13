@@ -4,8 +4,7 @@ export const validateEmail = (email: string): boolean => {
 };
 
 export const validatePassword = (password: string): boolean => {
-  // TODO Add password validation logic
-  return true;
+  return password.length >= 8;
 };
 
 export const validateForm = (email: string, password: string) => {

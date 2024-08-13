@@ -30,7 +30,7 @@ const InputField: React.FC<InputFieldProps> = ({
   containerStyle,
   inputStyle,
   secureTextEntry,
-  errorMessage,
+  errorMessage = null,
   ...props
 }) => {
   const theme = useTheme();

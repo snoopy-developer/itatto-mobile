@@ -1,13 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Touchable,
+  TouchableOpacity,
+} from 'react-native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import React from 'react';
+import { useRouter } from 'expo-router';
+import { logoutUser } from '@/modules/userActions';
 
 export default function ModalScreen() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => {
+          logoutUser();
+          router.replace('/');
+        }}
+      >
+        <Text>Logout</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Modal</Text>
       <View
         style={styles.separator}

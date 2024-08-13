@@ -37,7 +37,7 @@ export const { fetch, success, error } = userProfileSlice.actions;
 export default userProfileSlice.reducer;
 
 export const fetchUserProfile = createAsyncThunk<
-  void,
+  any,
   void,
   { rejectValue: string }
 >('userProfile/fetchUserProfile', async (_, thunkAPI) => {
@@ -46,6 +46,7 @@ export const fetchUserProfile = createAsyncThunk<
   try {
     const response = await global.api.get('/me');
     thunkAPI.dispatch(userProfileSlice.actions.success(response.data));
+    return response.data;
   } catch (error) {
     console.log(error);
     thunkAPI.dispatch(
