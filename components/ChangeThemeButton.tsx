@@ -1,28 +1,37 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
-import { useCustomTheme } from '@/modules/theme-context';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useColorScheme } from '@/modules/ColorSchemeContext';
+import { View } from './Themed';
+import { StyleSheet } from 'react-native';
+import MoonStars from '../assets/images/svg/MoonStars.svg';
 
-const ChangeThemeButton: React.FC = () => {
+export interface ThemeProps {
+  style?: any;
+  size?: number;
+}
+
+const ChangeThemeButton: React.FC<ThemeProps> = ({ size = 24, style }) => {
   const theme = useTheme();
-  const { toggleTheme } = useCustomTheme();
+  const { toggle, colorScheme, active } = useColorScheme();
 
   const pan = Gesture.Pan()
     .runOnJS(true)
     .onBegin((e) => {
-      toggleTheme(e.absoluteX, e.absoluteY);
+      if (!active) {
+        toggle(e.absoluteX, e.absoluteY);
+      }
     });
 
-  const handleThemeChange = () => {
-    toggleTheme();
-  };
-
   return (
-    // style={styles.iconContainer} onPress={handleThemeChange}
     <GestureDetector gesture={pan}>
-      <FontAwesome name="moon-o" size={24} color={theme.colors.textPrimary} />
+      <View style={[styles.iconContainer, style]}>
+        <MoonStars
+          width={size}
+          height={size}
+          color={theme.colors.textPrimary}
+        />
+      </View>
     </GestureDetector>
   );
 };

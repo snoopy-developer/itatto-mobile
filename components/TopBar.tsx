@@ -1,18 +1,12 @@
 import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { screenDefaultPadding } from '@/constants/Params';
-
 import MenuIcon from '@assets/images/svg/Menu.svg';
 import ChangeThemeButton from '@components/ChangeThemeButton';
+import NotificationBell from '@components/Buttons/NotificationIconButton';
+import UserProfileIcon from '@components/userProfile/UserProfileIcon';
 
 const TopBar: React.FC<{ navigation?: any }> = ({ navigation }) => {
   const theme = useTheme();
@@ -31,26 +25,9 @@ const TopBar: React.FC<{ navigation?: any }> = ({ navigation }) => {
       <View style={styles.rightIconsContainer}>
         <ChangeThemeButton />
 
-        {/* <TouchableOpacity
-          style={styles.iconContainer}
-          onPress={() => console.log('Open Notifications')}
-        >
-          <View>
-            <FontAwesome
-              name="bell-o"
-              size={24}
-              color={theme.colors.textPrimary}
-            />
-            <View style={styles.notificationDot} />
-          </View>
-        </TouchableOpacity>
+        <NotificationBell />
 
-        <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: 'https://your-image-url.com' }}
-            style={styles.profilePicture}
-          />
-        </View> */}
+        <UserProfileIcon />
       </View>
     </View>
   );
@@ -67,6 +44,14 @@ const createStylesheet = (theme: any) =>
       backgroundColor: theme.colors.paperBg,
       borderRadius: 10,
       marginHorizontal: screenDefaultPadding,
+      shadowColor: theme.colors.grayShadowSmall,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 1,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
     iconContainer: {
       padding: 10,
@@ -76,6 +61,7 @@ const createStylesheet = (theme: any) =>
     rightIconsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      gap: 16,
     },
     profileContainer: {
       position: 'relative',
@@ -96,6 +82,8 @@ const createStylesheet = (theme: any) =>
       right: 0,
       width: 10,
       height: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.bodyBg,
       backgroundColor: theme.colors.error500,
       borderRadius: 5,
     },

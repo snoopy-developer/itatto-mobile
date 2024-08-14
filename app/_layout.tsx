@@ -3,7 +3,7 @@ import { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import React from 'react';
@@ -11,8 +11,12 @@ import { store } from '@/redux/store';
 import { Provider } from 'react-redux';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { CustomThemeProvider, useCustomTheme } from '@/modules/theme-context';
 import { lightTheme, darkTheme } from '@/themes/themes';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  ColorSchemeProvider,
+  useColorScheme,
+} from '@/modules/ColorSchemeContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -52,26 +56,22 @@ export default function RootLayout() {
   }
 
   return (
-    <CustomThemeProvider>
-      <RootLayoutNav />
-    </CustomThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ColorSchemeProvider>
+        <RootLayoutNav />
+      </ColorSchemeProvider>
+    </GestureHandlerRootView>
   );
 }
 
 function RootLayoutNav() {
-  const { theme } = useCustomTheme();
-
-  const [currentTheme, setCurrentTheme] = useState(
-    theme === 'dark' ? lightTheme : darkTheme,
-  );
-
-  useEffect(() => {
-    setCurrentTheme(theme === 'dark' ? lightTheme : darkTheme);
-  }, [theme]);
+  const { colorScheme } = useColorScheme();
 
   return (
     <SafeAreaProvider>
-      <StyledThemeProvider theme={currentTheme}>
+      <StyledThemeProvider
+        theme={colorScheme === 'dark' ? darkTheme : lightTheme}
+      >
         <Provider store={store}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />

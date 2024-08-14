@@ -16,18 +16,7 @@ export default function TabOneScreen() {
   const router = useRouter();
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.bodyBg }]}>
-      <Text style={styles.title}>
-        Wellcome Back {userProfile?.data?.full_name}
-        To DashBoard
-      </Text>
-      <TouchableOpacity
-        onPress={() => {
-          logoutUser();
-          router.replace('/(authMenu)');
-        }}
-      >
-        <Text>Logout</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Wellcome to Calendar Screen</Text>
     </View>
   );
 }
