@@ -73,7 +73,7 @@ function RootLayoutNav() {
         theme={colorScheme === 'dark' ? darkTheme : lightTheme}
       >
         <Provider store={store}>
-          <Stack screenOptions={{ headerShown: false }}>
+          <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(homeMenu)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

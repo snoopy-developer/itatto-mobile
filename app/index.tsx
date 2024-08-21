@@ -5,12 +5,10 @@ import { Dimensions, View, useColorScheme } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import {
-  getApiKey,
-  handleUserProfileFetch,
-  logoutUser,
-} from '@/modules/userActions';
-import { fetchUserProfile } from '@/redux/reducers/userProfile';
+import { getApiKey, handleUserProfileFetch } from '@/modules/userActions';
+import { fetchServices } from '@/redux/reducers/services';
+import { fetchSettings } from '@/redux/reducers/settings';
+
 const RootPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -23,6 +21,8 @@ const RootPage = () => {
         global.apiKey = apiKey;
         // verify login credentials by getting the user
         handleUserProfileFetch(dispatch, router);
+        dispatch(fetchServices());
+        dispatch(fetchSettings());
       } else {
         router.replace('/(authMenu)');
       }

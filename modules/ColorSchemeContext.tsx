@@ -11,7 +11,7 @@ import {
 import type { SkImage } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
 import type { ReactNode, RefObject } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   createContext,
   useCallback,
@@ -20,6 +20,7 @@ import {
   useRef,
 } from 'react';
 import { Appearance, Dimensions, View, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   useDerivedValue,
@@ -29,6 +30,24 @@ import {
 
 const wait = async (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+const saveThemeToStorage = async (theme: ColorSchemeName) => {
+  try {
+    await AsyncStorage.setItem('theme', theme);
+  } catch (error) {
+    console.error('Failed to save the theme to storage', error);
+  }
+};
+
+const getThemeFromStorage = async (): Promise<ColorSchemeName | null> => {
+  try {
+    const theme = await AsyncStorage.getItem('theme');
+    return theme as ColorSchemeName | null;
+  } catch (error) {
+    console.error('Failed to load the theme from storage', error);
+    return null;
+  }
+};
 
 export type ColorSchemeName = 'light' | 'dark';
 
@@ -70,7 +89,7 @@ export const useColorScheme = () => {
   const toggle = useCallback(
     async (x: number, y: number) => {
       const newColorScheme = colorScheme === 'light' ? 'dark' : 'light';
-
+      saveThemeToStorage(newColorScheme);
       dispatch({
         active: true,
         colorScheme,
@@ -144,6 +163,23 @@ export const ColorSchemeProvider = ({ children }: ColorSchemeProviderProps) => {
     { colorScheme, overlay1, overlay2, active, statusBarStyle },
     dispatch,
   ] = useReducer(colorSchemeReducer, defaultValue);
+
+  useEffect(() => {
+    const loadTheme = async () => {
+      const savedTheme = await getThemeFromStorage();
+      if (savedTheme) {
+        dispatch({
+          active: false,
+          colorScheme: savedTheme,
+          overlay1: null,
+          overlay2: null,
+          statusBarStyle: savedTheme === 'light' ? 'dark' : 'light',
+        });
+      }
+    };
+    loadTheme();
+  }, []);
+
   const r = useDerivedValue(() => {
     return mix(transition.value, 0, circle.value.r);
   });

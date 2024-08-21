@@ -23,7 +23,7 @@ const NotificationBell: React.FC<NotificationIconButtonProps> = ({
 
   return (
     <TouchableOpacity style={[styles.iconContainer, style]} onPress={openModal}>
-      <View>
+      <View style={styles.bellContainer}>
         <Bell height={size} width={size} color={theme.colors.textPrimary} />
         {hasNotifications && <View style={styles.notificationDot} />}
       </View>
@@ -37,6 +37,11 @@ const createStylesheet = (theme: any) =>
       padding: 10,
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: 'transparent',
+    },
+    bellContainer: {
+      position: 'relative',
+      backgroundColor: 'transparent',
     },
     notificationDot: {
       position: 'absolute',

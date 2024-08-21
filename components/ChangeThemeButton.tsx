@@ -38,6 +38,7 @@ const ChangeThemeButton: React.FC<ThemeProps> = ({ size = 24, style }) => {
 
 const styles = StyleSheet.create({
   iconContainer: {
+    backgroundColor: 'transparent',
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',

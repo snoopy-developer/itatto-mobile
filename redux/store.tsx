@@ -1,5 +1,8 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import userProfile from './reducers/userProfile';
+import services from './reducers/services';
+import settings from './reducers/settings';
+import dashboard from './reducers/dashboard';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -15,8 +18,9 @@ import {
 
 const rootReducer = combineReducers({
   user: userProfile,
-  // weeks: weeksReducer,
-  // lessons: lessonsReducer,
+  services: services,
+  settings: settings,
+  dashboard: dashboard,
 });
 
 const persistConfig = {

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import InputField from '@/components/InputField';
 import ToggleButton from '@/components/ToggleButton';
 import { SansText } from '@/components/StyledText';
 import { useTheme } from 'styled-components/native';
-import { validateEmail } from '@/helpers/authHelper';
+import { createSignInStylesheet, validateEmail } from '@/helpers/authHelper';
 import {
   handleUserLoginResponse,
   handleUserProfileFetch,
@@ -15,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { screenDefaultHeight } from '@/constants/Params';
 import { AppDispatch } from '@/redux/store';
 import { useDispatch } from 'react-redux';
+import { useColorScheme } from '@/modules/ColorSchemeContext';
 
 const SignInScreen: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -28,7 +29,8 @@ const SignInScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const theme = useTheme();
-  const styles = createStylesheet(theme);
+  const colorScheme = useColorScheme();
+  const styles = createSignInStylesheet(theme);
 
   const handleSignIn = () => {
     if (!validateEmail(email)) {
@@ -67,6 +69,18 @@ const SignInScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Image
+          source={
+            colorScheme.colorScheme === 'light'
+              ? require('@assets/images/Logo.png')
+              : require('@assets/images/LogoDarkMode.png')
+          }
+          style={styles.logo}
+          resizeMode="center"
+        />
+      </View>
+
       <SansText style={styles.title}>Sign in to your account</SansText>
 
       <ToggleButton
@@ -127,78 +141,5 @@ const SignInScreen: React.FC = () => {
     </View>
   );
 };
-
-const createStylesheet = (theme: any) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      padding: 20,
-      backgroundColor: theme.colors.bodyBg,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 20,
-      textAlign: 'center',
-      color: theme.colors.textPrimary,
-    },
-    toggleContainer: {
-      flexDirection: 'row',
-      marginBottom: 20,
-    },
-    toggleButton: {
-      flex: 1,
-      paddingVertical: 10,
-      alignItems: 'center',
-      backgroundColor: theme.colors.paperBg,
-      borderColor: theme.colors.inputBorder,
-      borderWidth: 1,
-    },
-    activeButton: {
-      backgroundColor: theme.colors.success500,
-      borderColor: 'transparent',
-    },
-    toggleButtonText: {
-      fontSize: 16,
-      color: theme.colors.textSecondary,
-    },
-    activeButtonText: {
-      color: theme.colors.grayLight,
-    },
-    inputContainer: {
-      marginBottom: 0,
-    },
-    forgotPassword: {
-      alignItems: 'flex-end',
-      marginBottom: 20,
-    },
-    forgotPasswordText: {
-      color: theme.colors.textDisabled,
-    },
-    signInButton: {
-      backgroundColor: theme.colors.success500,
-      padding: 15,
-      alignItems: 'center',
-      borderRadius: 4,
-      marginBottom: 20,
-    },
-    signInButtonText: {
-      color: theme.colors.grayLight,
-      fontSize: 16,
-    },
-    signUpContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-    },
-    signUpText: {
-      color: theme.colors.textDisabled,
-    },
-    signUpLink: {
-      color: theme.colors.success500,
-      fontWeight: 'bold',
-      marginLeft: 5,
-    },
-  });
 
 export default SignInScreen;

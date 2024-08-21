@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useTheme } from 'styled-components';
 import CloseIcon from '@assets/images/svg/XIcon.svg';
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
+import { useColorScheme } from '@/modules/ColorSchemeContext';
 interface DrawerHeaderProps {
   navigation: DrawerNavigationHelpers;
 }
@@ -11,12 +12,18 @@ const DrawerHeader: React.FC<DrawerHeaderProps> = ({ navigation }) => {
   const theme = useTheme();
   const styles = createStylesheet(theme);
 
+  const colorScheme = useColorScheme();
+
   return (
     <View style={styles.headerContainer}>
       <Image
-        source={require('@assets/images/Logo.png')}
+        source={
+          colorScheme.colorScheme === 'light'
+            ? require('@assets/images/Logo.png')
+            : require('@assets/images/LogoDarkMode.png')
+        }
         style={styles.logo}
-        resizeMode="contain"
+        resizeMode="center"
       />
       <TouchableOpacity onPress={() => navigation?.closeDrawer()}>
         <CloseIcon width={24} height={24} color={theme.colors.textPrimary} />
