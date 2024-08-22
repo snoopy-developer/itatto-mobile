@@ -29,7 +29,7 @@ export const handleUserProfileFetch = async (
 ) => {
   try {
     const response = await dispatch(fetchUserProfile()).unwrap();
-    router.replace('/(homeMenu)');
+    router.replace('/(homeMenu)/homeTab');
   } catch (error: any) {
     logoutUser();
     router.replace('/(authMenu)');

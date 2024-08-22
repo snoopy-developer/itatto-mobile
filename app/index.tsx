@@ -20,9 +20,9 @@ const RootPage = () => {
       if (apiKey) {
         global.apiKey = apiKey;
         // verify login credentials by getting the user
-        handleUserProfileFetch(dispatch, router);
         dispatch(fetchServices());
         dispatch(fetchSettings());
+        handleUserProfileFetch(dispatch, router);
       } else {
         router.replace('/(authMenu)');
       }

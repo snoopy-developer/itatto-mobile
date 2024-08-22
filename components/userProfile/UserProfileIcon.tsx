@@ -15,7 +15,7 @@ interface UserProfileIconProps {
 }
 
 const UserProfileIcon: React.FC<UserProfileIconProps> = ({
-  onPress,
+  onPress = () => {},
   containerStyle,
 }) => {
   const theme = useTheme();

@@ -23,7 +23,7 @@ export default function HomeLayout() {
         },
       }}
     >
-      <Drawer.Screen name="index" />
+      <Drawer.Screen name="homeTab" />
       <Drawer.Screen name="services" />
       <Drawer.Screen name="messages" />
       <Drawer.Screen name="calendar" />

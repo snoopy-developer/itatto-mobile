@@ -27,7 +27,9 @@ const TopBar: React.FC<{ navigation?: any }> = ({ navigation }) => {
 
         <NotificationBell />
 
-        <UserProfileIcon />
+        <UserProfileIcon
+          onPress={() => navigation?.navigate('userSettingsModal')}
+        />
       </View>
     </View>
   );

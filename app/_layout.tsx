@@ -76,7 +76,13 @@ function RootLayoutNav() {
           <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(homeMenu)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            <Stack.Screen
+              name="userSettingsModal"
+              options={{
+                presentation: 'fullScreenModal',
+                animation: 'slide_from_bottom',
+              }}
+            />
           </Stack>
         </Provider>
       </StyledThemeProvider>
