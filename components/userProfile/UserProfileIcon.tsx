@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface UserProfileIconProps {
   onPress?: () => void;
@@ -22,6 +24,10 @@ const UserProfileIcon: React.FC<UserProfileIconProps> = ({
   const styles = createStylesheet(theme);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const avatar = useSelector(
+    (state: RootState) => state.user.userProfile?.data?.avatar,
+  );
 
   useEffect(() => {
     // TODO: Add loading state
@@ -38,7 +44,7 @@ const UserProfileIcon: React.FC<UserProfileIconProps> = ({
       ) : (
         <Image
           source={{
-            uri: imageUrl || 'https://default-image-url.com/default.png',
+            uri: avatar || 'https://default-image-url.com/default.png',
           }}
           style={styles.image}
         />

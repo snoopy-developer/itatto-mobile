@@ -16,7 +16,7 @@ interface ApiRequestConfig {
   loginOnUnauthenticated?: boolean;
 }
 
-global.apiUrl = 'https://itattoo-api.khaosoi.tech/api/v1';
+global.apiUrl = 'https://api.itattoo.com/api/v1';
 global.apiKey = null;
 
 const apiRequest = async ({

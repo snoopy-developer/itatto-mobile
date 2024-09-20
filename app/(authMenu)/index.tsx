@@ -49,6 +49,8 @@ const SignInScreen: React.FC = () => {
         setEmailError(null);
         setPasswordError(null);
 
+        console.log(response);
+
         handleUserLoginResponse(response).finally(() => {
           handleUserProfileFetch(dispatch, router);
         });

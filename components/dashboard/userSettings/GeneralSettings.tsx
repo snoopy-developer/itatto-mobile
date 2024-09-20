@@ -11,6 +11,8 @@ import { useTheme } from 'styled-components/native';
 import DropdownSelector from '@components/Buttons/DropdownSelector';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 const GeneralSettings: React.FC = () => {
   const theme = useTheme();
@@ -22,6 +24,8 @@ const GeneralSettings: React.FC = () => {
   const [timezone, setTimezone] = useState('GMT Standard Time (GMT)');
   const [cancellationPolicy, setCancellationPolicy] = useState('Two days');
   const [autoDelete, setAutoDelete] = useState('Previous year');
+
+  const { userProfile } = useSelector((state: RootState) => state.user);
 
   const handleUpdate = () => {
     Alert.alert(

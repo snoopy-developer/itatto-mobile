@@ -18,10 +18,10 @@ import CustomersIcon from '@/assets/images/svg/CustomersIcon.svg';
 import AppointmentsPerMonth from '@/components/dashboard/AppointmentChart';
 import MostPopularServices from '@/components/dashboard/MostPopularServices';
 import Services from '@/components/dashboard/Services';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { screenDefaultHeight } from '@/constants/Params';
 
 export default function TabOneScreen() {
-  const { userProfile } = useSelector((state: RootState) => state.user);
-
   const [selectedYear, setSelectedYear] = useState<string>(
     `${new Date().getFullYear()}`,
   );
@@ -59,7 +59,10 @@ export default function TabOneScreen() {
         style={[styles.scroll]}
         contentContainerStyle={[
           styles.container,
-          { paddingTop: insets.top + 80, paddingBottom: insets.bottom + 30 },
+          {
+            paddingTop: insets.top + RFValue(80, screenDefaultHeight),
+            paddingBottom: insets.bottom + 30,
+          },
         ]}
       >
         <TimeIntervalSelector

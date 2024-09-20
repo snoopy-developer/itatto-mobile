@@ -17,6 +17,7 @@ const RootPage = () => {
 
   useEffect(() => {
     getApiKey().then((apiKey: string | null) => {
+      console.log('apiKey:', apiKey);
       if (apiKey) {
         global.apiKey = apiKey;
         // verify login credentials by getting the user

@@ -2,12 +2,14 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ServicesState {
   services: any | null;
+  servicesMap: {};
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ServicesState = {
   services: null,
+  servicesMap: {},
   loading: false,
   error: null,
 };

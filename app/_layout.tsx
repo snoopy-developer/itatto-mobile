@@ -17,7 +17,9 @@ import {
   ColorSchemeProvider,
   useColorScheme,
 } from '@/modules/ColorSchemeContext';
+import { CalendarProvider } from '@/modules/CalendarContext';
 
+import { NavigationContainer } from '@react-navigation/native';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -56,11 +58,15 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ColorSchemeProvider>
-        <RootLayoutNav />
-      </ColorSchemeProvider>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ColorSchemeProvider>
+          <CalendarProvider>
+            <RootLayoutNav />
+          </CalendarProvider>
+        </ColorSchemeProvider>
+      </GestureHandlerRootView>
+    </Provider>
   );
 }
 
@@ -72,19 +78,17 @@ function RootLayoutNav() {
       <StyledThemeProvider
         theme={colorScheme === 'dark' ? darkTheme : lightTheme}
       >
-        <Provider store={store}>
-          <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(homeMenu)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="userSettingsModal"
-              options={{
-                presentation: 'fullScreenModal',
-                animation: 'slide_from_bottom',
-              }}
-            />
-          </Stack>
-        </Provider>
+        <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(homeMenu)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="userSettingsModal"
+            options={{
+              presentation: 'fullScreenModal',
+              animation: 'slide_from_bottom',
+            }}
+          />
+        </Stack>
       </StyledThemeProvider>
     </SafeAreaProvider>
   );

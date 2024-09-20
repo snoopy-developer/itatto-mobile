@@ -3,6 +3,8 @@ import userProfile from './reducers/userProfile';
 import services from './reducers/services';
 import settings from './reducers/settings';
 import dashboard from './reducers/dashboard';
+import upcomingAppointsments from './reducers/upcomingAppointsments';
+import appointments from './reducers/appointments';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -21,6 +23,8 @@ const rootReducer = combineReducers({
   services: services,
   settings: settings,
   dashboard: dashboard,
+  upcomingAppointsments: upcomingAppointsments,
+  appointments: appointments,
 });
 
 const persistConfig = {
