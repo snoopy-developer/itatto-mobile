@@ -32,6 +32,8 @@ const LeftBar: React.FC = () => {
     (state: RootState) => state.appointments,
   );
 
+  const { userProfile } = useSelector((state: RootState) => state.user);
+
   useEffect(() => {
     const getAppointments = async () => {
       const { firstDay, lastDay } = getCalendarBounds(monthYearKey);
@@ -44,13 +46,12 @@ const LeftBar: React.FC = () => {
             to: lastDay,
             duration: '',
             status: '',
-            staff_ids: [25],
+            staff_ids: [userProfile.id],
             customer_id: '',
             service_id: '',
             location_id: '',
           }),
         );
-        console.log('trigered');
       }
     };
     getAppointments();

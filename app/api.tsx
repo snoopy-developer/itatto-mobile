@@ -89,6 +89,18 @@ global.api = {
   ) => {
     return apiRequest({ method: 'PUT', endpoint, data: payload, extraHeaders });
   },
+  patch: (
+    endpoint: string,
+    payload: any,
+    extraHeaders: Record<string, string> = {},
+  ) => {
+    return apiRequest({
+      method: 'PATCH',
+      endpoint,
+      data: payload,
+      extraHeaders,
+    });
+  },
   delete: (endpoint: string, payload: any) => {
     return apiRequest({ method: 'DELETE', endpoint, data: payload });
   },

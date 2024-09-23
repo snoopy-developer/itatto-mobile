@@ -79,8 +79,18 @@ function RootLayoutNav() {
         theme={colorScheme === 'dark' ? darkTheme : lightTheme}
       >
         <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(homeMenu)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="index"
+            options={{ headerShown: false, animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="(homeMenu)"
+            options={{ headerShown: false, animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="(authMenu)"
+            options={{ headerShown: false, animation: 'fade' }}
+          />
           <Stack.Screen
             name="userSettingsModal"
             options={{

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   TextInput,
@@ -9,105 +9,231 @@ import {
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import DropdownSelector from '@components/Buttons/DropdownSelector';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native-gesture-handler';
+
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { useRouter } from 'expo-router';
 
+const cancellationPolicyOptions = [
+  { label: 'Allow anytime', value: 0 },
+  { label: 'Two days', value: 2 },
+  { label: 'Tree days', value: 3 },
+  { label: 'Four days', value: 4 },
+  { label: 'Five days', value: 5 },
+  { label: 'Always', value: 99999 },
+];
+
+const autoDeletePeriodOptions = [
+  { label: 'Newer', value: 99999 },
+  { label: 'Previous year', value: 365 },
+  { label: 'Previous month', value: 30 },
+  { label: 'Previous week', value: 7 },
+  { label: 'Previous day', value: 1 },
+];
+
+interface UpdateOrganisationPayload {
+  autodelete_period_days: number;
+  cancellation_buffer_days: number;
+  currency_id: number;
+  language_id: number;
+  name: string;
+  slug: string;
+  timezone: string;
+}
 const GeneralSettings: React.FC = () => {
   const theme = useTheme();
   const styles = createStylesheet(theme);
+  const router = useRouter();
 
-  const [businessName, setBusinessName] = useState('iTattooTest');
-  const [language, setLanguage] = useState('English');
-  const [currency, setCurrency] = useState('Euro');
-  const [timezone, setTimezone] = useState('GMT Standard Time (GMT)');
-  const [cancellationPolicy, setCancellationPolicy] = useState('Two days');
-  const [autoDelete, setAutoDelete] = useState('Previous year');
+  const [businessName, setBusinessName] = useState('');
+  const [language, setLanguage] = useState('');
+  const [currency, setCurrency] = useState('');
+  const [timezone, setTimezone] = useState('');
+  const [cancellationPolicy, setCancellationPolicy] = useState('');
+  const [autoDelete, setAutoDelete] = useState('');
 
   const { userProfile } = useSelector((state: RootState) => state.user);
+  const { settings } = useSelector((state: RootState) => state.settings);
 
+  useEffect(() => {
+    if (userProfile) {
+      const org = userProfile.data.organisations.find(
+        (org: any) => org.id === userProfile.data.default_organisation_id,
+      );
+
+      setBusinessName(org.name);
+
+      setLanguage(
+        settings.languages.find(
+          (language: any) => language.id === org.language_id,
+        ).name,
+      );
+      setCurrency(
+        settings.currencies.find(
+          (currency: any) => currency.id === org.currency_id,
+        ).name,
+      );
+      setTimezone(org.timezone);
+      setCancellationPolicy(
+        cancellationPolicyOptions.find(
+          (option: any) => option.value === org.cancellation_buffer_days,
+        )?.label || 'Anytime',
+      );
+      setAutoDelete(
+        autoDeletePeriodOptions.find(
+          (option: any) => option.value === org.autodelete_period_days,
+        )?.label || 'Newer',
+      );
+    }
+  }, [userProfile]);
   const handleUpdate = () => {
-    Alert.alert(
-      'Settings Updated',
-      'Your settings have been successfully updated.',
-    );
-    // Here you can add your logic to update the settings on the server or local storage
+    const payload = {
+      autodelete_period_days:
+        autoDeletePeriodOptions.find(
+          (option: any) => option.label === autoDelete,
+        )?.value || 99999,
+      cancellation_buffer_days:
+        cancellationPolicyOptions.find(
+          (option: any) => option.label === cancellationPolicy,
+        )?.value || 0,
+      currency_id: settings.currencies.find(
+        (option: any) => option.name === currency,
+      ).id,
+      language_id: settings.languages.find(
+        (option: any) => option.name === language,
+      ).id,
+      name: businessName,
+      slug: businessName.toLowerCase().replace(/ /g, '-'),
+      timezone: timezone,
+    };
+
+    updateOrganisation(userProfile.data.default_organisation_id, payload);
+  };
+
+  const updateOrganisation = async (
+    organisationId: number,
+    payload: UpdateOrganisationPayload,
+  ) => {
+    const url = `/organisations/${organisationId}`;
+
+    try {
+      const response = await global.api.patch(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      Alert.alert(
+        'Settings Updated',
+        'Your settings have been successfully updated.',
+      );
+
+      return response.data;
+    } catch (error) {
+      Alert.alert(
+        'Settings Update Failed',
+        'Try again later or contact support.',
+      );
+      console.error('Error updating organisation:', error);
+      throw error;
+    }
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <SafeAreaView>
-          <Text style={styles.title}>General Settings</Text>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Business name</Text>
-            <TextInput
-              style={styles.input}
-              value={businessName}
-              onChangeText={setBusinessName}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Language</Text>
-            <DropdownSelector
-              label="Language"
-              options={['English', 'Spanish', 'French']}
-              selectedOption={language}
-              onSelect={setLanguage}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Currency</Text>
-            <DropdownSelector
-              label="Currency"
-              options={['Euro', 'USD', 'GBP']}
-              selectedOption={currency}
-              onSelect={setCurrency}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Timezone</Text>
-            <DropdownSelector
-              label="Timezone"
-              options={[
-                'GMT Standard Time (GMT)',
-                'Pacific Time (PT)',
-                'Central Time (CT)',
-              ]}
-              selectedOption={timezone}
-              onSelect={setTimezone}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Disallow appointment cancellation</Text>
-            <DropdownSelector
-              label="Cancellation Policy"
-              options={['One day', 'Two days', 'Three days']}
-              selectedOption={cancellationPolicy}
-              onSelect={setCancellationPolicy}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Auto delete</Text>
-            <DropdownSelector
-              label="Auto delete"
-              options={['Previous year', 'Previous month']}
-              selectedOption={autoDelete}
-              onSelect={setAutoDelete}
-            />
-          </View>
-          <View style={styles.warningContainer}>
-            <Text style={styles.warningText}>
-              Please note that when deleting appointments, all related
-              statistics data will be also deleted
-            </Text>
-          </View>
-          <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-            <Text style={styles.updateButtonText}>Update</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
-      </ScrollView>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Text style={styles.title}>General Settings</Text>
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Business name</Text>
+        <TextInput
+          style={styles.input}
+          value={businessName}
+          onChangeText={setBusinessName}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Language</Text>
+        <DropdownSelector
+          label="Language"
+          options={settings.languages.map((language: any) => language.name)}
+          selectedOption={language}
+          onSelect={setLanguage}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Currency</Text>
+        <DropdownSelector
+          label="Currency"
+          options={settings.currencies.map((language: any) => language.name)}
+          selectedOption={currency}
+          onSelect={setCurrency}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Timezone</Text>
+        <DropdownSelector
+          label="Timezone"
+          options={[
+            'GMT-12:00',
+            'GMT-11:00',
+            'GMT-10:00',
+            'GMT-09:00',
+            'GMT-08:00',
+            'GMT-07:00',
+            'GMT-06:00',
+            'GMT-05:00',
+            'GMT-04:00',
+            'GMT-03:00',
+            'GMT-02:00',
+            'GMT-01:00',
+            'GMT+00:00',
+            'GMT+01:00',
+            'GMT+02:00',
+            'GMT+03:00',
+            'GMT+04:00',
+            'GMT+05:00',
+            'GMT+06:00',
+            'GMT+07:00',
+            'GMT+08:00',
+            'GMT+09:00',
+            'GMT+10:00',
+            'GMT+11:00',
+            'GMT+12:00',
+            'GMT+13:00',
+            'GMT+14:00',
+          ]}
+          selectedOption={timezone}
+          onSelect={setTimezone}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Disallow appointment cancellation</Text>
+        <DropdownSelector
+          label="Cancellation Policy"
+          options={cancellationPolicyOptions.map((option: any) => option.label)}
+          selectedOption={cancellationPolicy}
+          onSelect={setCancellationPolicy}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Auto delete</Text>
+        <DropdownSelector
+          label="Auto delete"
+          options={autoDeletePeriodOptions.map((option: any) => option.label)}
+          selectedOption={autoDelete}
+          onSelect={setAutoDelete}
+        />
+      </View>
+      <View style={styles.warningContainer}>
+        <Text style={styles.warningText}>
+          Please note that when deleting appointments, all related statistics
+          data will be also deleted
+        </Text>
+      </View>
+      <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
+        <Text style={styles.updateButtonText}>Update</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -156,12 +282,12 @@ const createStylesheet = (theme: any) =>
     },
     warningContainer: {
       padding: 16,
-      backgroundColor: theme.colors.warningBg,
+      backgroundColor: theme.colors.warning100,
       borderRadius: 8,
       marginBottom: 16,
     },
     warningText: {
-      color: theme.colors.warningText,
+      color: theme.colors.warning500,
       fontSize: 14,
     },
     updateButton: {

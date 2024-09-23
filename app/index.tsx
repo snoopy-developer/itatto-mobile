@@ -8,6 +8,7 @@ import { AppDispatch } from '@/redux/store';
 import { getApiKey, handleUserProfileFetch } from '@/modules/userActions';
 import { fetchServices } from '@/redux/reducers/services';
 import { fetchSettings } from '@/redux/reducers/settings';
+import { fetchLocations } from '@/redux/reducers/locations';
 
 const RootPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,6 +24,7 @@ const RootPage = () => {
         // verify login credentials by getting the user
         dispatch(fetchServices());
         dispatch(fetchSettings());
+        dispatch(fetchLocations());
         handleUserProfileFetch(dispatch, router);
       } else {
         router.replace('/(authMenu)');
