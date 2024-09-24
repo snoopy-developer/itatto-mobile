@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,9 @@ import { useRouter } from 'expo-router';
 
 import GeneralSettings from './GeneralSettings';
 import LocationsSettings from './LocationsSettings';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import { fetchUserProfile } from '@/redux/reducers/userProfile';
 
 const SettingList = [
   { Name: 'General', icon: <SettingsIcon /> },
@@ -48,6 +51,12 @@ const SettingsModal: React.FC = () => {
 
   const router = useRouter();
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchUserProfile() as any);
+  }, []);
+
   const handleTabLayout = (index: number, layout: LayoutChangeEvent) => {
     const newLayouts = [...settingsTabsLayouts, layout.nativeEvent.layout];
     if (index === 0) {
@@ -72,17 +81,17 @@ const SettingsModal: React.FC = () => {
       new Promise((resolve) => setTimeout(resolve, ms));
 
     Promise.resolve().then(async () => {
-      await delay(200);
+      await delay(100);
 
       setCurrentTab(SettingList[index].Name);
     });
   };
 
   const triggerContentAnimation = async () => {
-    opacity.value = withTiming(0, { duration: 200 });
-    scale.value = withTiming(0.8, { duration: 200 }, () => {
-      opacity.value = withTiming(1, { duration: 300 });
-      scale.value = withTiming(1, { duration: 300 });
+    opacity.value = withTiming(0, { duration: 100 });
+    scale.value = withTiming(0.8, { duration: 100 }, () => {
+      opacity.value = withTiming(1, { duration: 200 });
+      scale.value = withTiming(1, { duration: 200 });
     });
   };
 

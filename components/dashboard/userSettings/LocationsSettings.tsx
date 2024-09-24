@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import MarketIcon from '@assets/images/svg/MarketIcon.svg';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { Location } from '@/redux/reducers/locations';
+import { setUserProfile } from '@/redux/reducers/userProfile';
 
 import LocationMarker from '@assets/images/svg/LocationMarker.svg';
 import PhoneIcon from '@assets/images/svg/PhoneIcon.svg';
@@ -37,15 +38,14 @@ const Locations: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {locations &&
-        locations?.map((location) => (
-          <LocationCard
-            key={location.id}
-            location={location}
-            onEdit={() => handleEditLocation(location)}
-            theme={theme}
-          />
-        ))}
+      {locations?.map((location) => (
+        <LocationCard
+          key={location?.id}
+          location={location}
+          onEdit={() => handleEditLocation(location)}
+          theme={theme}
+        />
+      ))}
     </View>
   );
 };
@@ -56,13 +56,26 @@ const LocationCard: React.FC<{
   theme: any;
 }> = ({ location, onEdit, theme }) => {
   const styles = createStylesheet(theme);
+  const dispatch = useDispatch();
 
+  const { userProfile } = useSelector((state: RootState) => state.user);
+
+  const handleUpdateProfile = (id: number) => {
+    const updatedProfile = {
+      ...userProfile,
+      data: {
+        ...userProfile?.data,
+        default_organisation_id: id,
+      },
+    };
+    dispatch(setUserProfile(updatedProfile));
+  };
   return (
     <View style={styles.locationCard}>
       <View style={styles.iconContainer}>
         <MarketIcon width={30} height={30} color={theme.colors.textPrimary} />
       </View>
-      <Text style={styles.locationName}>{location.name}</Text>
+      <Text style={styles.locationName}>{location?.name}</Text>
 
       <View style={styles.infoContainer}>
         <View style={styles.lineContainer}>
@@ -72,35 +85,56 @@ const LocationCard: React.FC<{
             color={theme.colors.textPrimary}
           />
           <Text style={styles.locationAddress}>
-            {location.address}
+            {location?.address}
             {'\n'}
-            {location.city}, {location.state}, {location.post_code}
+            {location?.city}, {location?.state}, {location?.post_code}
             {'\n'}
-            {location.country.name}
+            {location?.country?.name}
           </Text>
         </View>
         <View style={styles.lineContainer}>
           <PhoneIcon width={16} height={16} color={theme.colors.textPrimary} />
-          <Text style={styles.locationDetail}>{location.phone_number}</Text>
+          <Text style={styles.locationDetail}>{location?.phone_number}</Text>
         </View>
         <View style={styles.lineContainer}>
           <TaxIcon width={16} height={16} color={theme.colors.textPrimary} />
-          <Text style={styles.locationDetail}>{location.vat_number}</Text>
+          <Text style={styles.locationDetail}>{location?.vat_number}</Text>
         </View>
         <View style={styles.lineContainer}>
           <CopyIcon width={16} height={16} color={theme.colors.textPrimary} />
-          <Text style={styles.locationDetail}>{location.website}</Text>
+          <Text style={styles.locationDetail}>{location?.website}</Text>
         </View>
         <View style={styles.lineContainer}>
           <ClockIcon width={16} height={16} color={theme.colors.textPrimary} />
           <Text style={styles.locationDetail}>
-            {location.from_time} - {location.to_time}
+            {location?.from_time} - {location?.to_time}
           </Text>
         </View>
       </View>
 
       <TouchableOpacity style={styles.editButton} onPress={onEdit}>
         <Text style={styles.editButtonText}>Edit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.selectButton,
+          location.id === userProfile.data?.default_organisation_id &&
+            styles.disabledButton,
+        ]}
+        onPress={() => handleUpdateProfile(location.id)}
+        disabled={location.id === userProfile.data?.default_organisation_id}
+      >
+        <Text
+          style={[
+            styles.editButtonText,
+            location.id === userProfile.data?.default_organisation_id &&
+              styles.disabledButtonText,
+          ]}
+        >
+          {location.id === userProfile.data?.default_organisation_id
+            ? 'Selected'
+            : 'Select'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -192,6 +226,23 @@ const createStylesheet = (theme: any) =>
     editButtonText: {
       fontWeight: 'bold',
       color: theme.colors.textPrimary,
+    },
+    selectButton: {
+      marginTop: 12,
+      backgroundColor: theme.colors.success500,
+      padding: 8,
+      borderRadius: 5,
+      alignItems: 'center',
+    },
+    selectButtonText: {
+      fontWeight: 'bold',
+      color: theme.colors.bodyBg,
+    },
+    disabledButton: {
+      backgroundColor: theme.colors.secondary100,
+    },
+    disabledButtonText: {
+      color: theme.colors.textSecondary,
     },
     infoContainer: {
       flex: 1,

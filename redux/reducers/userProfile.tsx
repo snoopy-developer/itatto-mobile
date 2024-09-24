@@ -29,10 +29,14 @@ export const userProfileSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    setUserProfile: (state, action: PayloadAction<any>) => {
+      state.userProfile = action.payload;
+    },
   },
 });
 
-export const { fetch, success, error } = userProfileSlice.actions;
+export const { fetch, success, error, setUserProfile } =
+  userProfileSlice.actions;
 
 export default userProfileSlice.reducer;
 

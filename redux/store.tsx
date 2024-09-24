@@ -18,6 +18,7 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
+import customers from './reducers/customers';
 
 const rootReducer = combineReducers({
   user: userProfile,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   upcomingAppointments: upcomingAppointments,
   appointments: appointments,
   locations: locations,
+  customers: customers,
 });
 
 const persistConfig = {

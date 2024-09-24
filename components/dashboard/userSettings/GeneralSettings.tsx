@@ -10,7 +10,7 @@ import {
 import { useTheme } from 'styled-components/native';
 import DropdownSelector from '@components/Buttons/DropdownSelector';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useRouter } from 'expo-router';
 
@@ -44,6 +44,7 @@ const GeneralSettings: React.FC = () => {
   const theme = useTheme();
   const styles = createStylesheet(theme);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [businessName, setBusinessName] = useState('');
   const [language, setLanguage] = useState('');
@@ -58,34 +59,35 @@ const GeneralSettings: React.FC = () => {
   useEffect(() => {
     if (userProfile) {
       const org = userProfile.data.organisations.find(
-        (org: any) => org.id === userProfile.data.default_organisation_id,
+        (org: any) => org?.id === userProfile.data.default_organisation_id,
       );
 
-      setBusinessName(org.name);
+      setBusinessName(org?.name);
 
       setLanguage(
-        settings.languages.find(
-          (language: any) => language.id === org.language_id,
-        ).name,
+        settings?.languages.find(
+          (language: any) => language.id === org?.language_id,
+        )?.name,
       );
       setCurrency(
-        settings.currencies.find(
-          (currency: any) => currency.id === org.currency_id,
-        ).name,
+        settings?.currencies.find(
+          (currency: any) => currency.id === org?.currency_id,
+        )?.name,
       );
-      setTimezone(org.timezone);
+      setTimezone(org?.timezone);
       setCancellationPolicy(
         cancellationPolicyOptions.find(
-          (option: any) => option.value === org.cancellation_buffer_days,
+          (option: any) => option.value === org?.cancellation_buffer_days,
         )?.label || 'Anytime',
       );
       setAutoDelete(
         autoDeletePeriodOptions.find(
-          (option: any) => option.value === org.autodelete_period_days,
+          (option: any) => option.value === org?.autodelete_period_days,
         )?.label || 'Newer',
       );
     }
   }, [userProfile]);
+
   const handleUpdate = () => {
     const payload = {
       autodelete_period_days:
@@ -96,10 +98,10 @@ const GeneralSettings: React.FC = () => {
         cancellationPolicyOptions.find(
           (option: any) => option.label === cancellationPolicy,
         )?.value || 0,
-      currency_id: settings.currencies.find(
+      currency_id: settings?.currencies.find(
         (option: any) => option.name === currency,
       ).id,
-      language_id: settings.languages.find(
+      language_id: settings?.languages.find(
         (option: any) => option.name === language,
       ).id,
       name: businessName,
@@ -156,7 +158,7 @@ const GeneralSettings: React.FC = () => {
         <Text style={styles.label}>Language</Text>
         <DropdownSelector
           label="Language"
-          options={settings.languages.map((language: any) => language.name)}
+          options={settings?.languages.map((language: any) => language.name)}
           selectedOption={language}
           onSelect={setLanguage}
         />
@@ -165,7 +167,7 @@ const GeneralSettings: React.FC = () => {
         <Text style={styles.label}>Currency</Text>
         <DropdownSelector
           label="Currency"
-          options={settings.currencies.map((language: any) => language.name)}
+          options={settings?.currencies.map((language: any) => language.name)}
           selectedOption={currency}
           onSelect={setCurrency}
         />

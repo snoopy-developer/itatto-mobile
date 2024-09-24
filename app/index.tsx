@@ -5,7 +5,11 @@ import { Dimensions, View, useColorScheme } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import { getApiKey, handleUserProfileFetch } from '@/modules/userActions';
+import {
+  getApiKey,
+  handleUserProfileFetch,
+  logoutUser,
+} from '@/modules/userActions';
 import { fetchServices } from '@/redux/reducers/services';
 import { fetchSettings } from '@/redux/reducers/settings';
 import { fetchLocations } from '@/redux/reducers/locations';
