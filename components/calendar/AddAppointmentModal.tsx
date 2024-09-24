@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import {
@@ -23,6 +25,7 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Customer, fetchCustomers } from '@/redux/reducers/customers';
+import ConsentForm from './ConsentForm';
 
 const timeOptions = [
   { label: '15 min', value: 15 },
@@ -77,7 +80,9 @@ const AddAppointmentForm = () => {
 
   const [client, setClient] = useState<Customer | null>(null);
   const [clientProjects, setClientProjects] = useState<any>([]);
+  const [openSignatureModal, setOpenSignatureModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
+  const [signatureImage, setSignatureImage] = useState('');
 
   const [paidBy, setPaidBy] = useState('');
   const [paidDeposit, setPaidDeposit] = useState('');
@@ -155,6 +160,42 @@ const AddAppointmentForm = () => {
   const handlePreviousStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSendSignature = async () => {
+    const project = clientProjects.find(
+      (project: any) => project.name === selectedProject,
+    );
+    const payload: any = {
+      consent_form_id: 1,
+      customer_id: client?.id,
+      project_id: project?.id,
+      signature: signatureImage,
+    };
+
+    try {
+      const response = await global.api.post(
+        '/projects/save-document',
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      project.signed = true;
+
+      return response.data;
+    } catch (error) {
+      Alert.alert(
+        'Save Signature Failed',
+        'Try again later or contact support.',
+      );
+
+      console.error('Error creating appointment:');
+      throw error;
     }
   };
 
@@ -442,6 +483,34 @@ const AddAppointmentForm = () => {
                     }}
                   >
                     <Text style={styles.headerText}>Consent form</Text>
+                    <View
+                      style={{
+                        width: '100%',
+                        flexDirection: 'row',
+                        gap: 10,
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() =>
+                          setOpenSignatureModal(!openSignatureModal)
+                        }
+                      >
+                        <Text style={styles.backButtonText}>
+                          Sign a new form
+                        </Text>
+                      </TouchableOpacity>
+                      {clientProjects?.find(
+                        (project: any) => project?.name === selectedProject,
+                      ).signed && (
+                        <TouchableOpacity style={styles.backButton}>
+                          <Text style={styles.backButtonText}>
+                            View signed form
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
                   </View>
                 )}
               </View>
@@ -515,6 +584,31 @@ const AddAppointmentForm = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={openSignatureModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setOpenSignatureModal(false)}
+      >
+        <View
+          style={[
+            styles.modalOverlay,
+            { paddingTop: insets.top, paddingBottom: insets.bottom },
+          ]}
+        >
+          <View style={{ flex: 1, width: '100%' }}>
+            <ConsentForm
+              userProfile={userProfile}
+              client={client}
+              handleCloseModal={() => setOpenSignatureModal(false)}
+              signatureImage={signatureImage}
+              setSignatureImage={setSignatureImage}
+              handleSendSignature={handleSendSignature}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -610,6 +704,10 @@ const createStylesheet = (theme: any, insets: any) =>
       flex: 1,
       marginLeft: 8,
     },
+    nextButtonText: {
+      color: theme.colors.grayLight,
+      fontWeight: 'bold',
+    },
     backButton: {
       backgroundColor: theme.colors.secondaryOLight,
       paddingVertical: 12,
@@ -632,10 +730,6 @@ const createStylesheet = (theme: any, insets: any) =>
     },
     cancelButtonText: {
       color: theme.colors.error500,
-      fontWeight: 'bold',
-    },
-    nextButtonText: {
-      color: theme.colors.grayLight,
       fontWeight: 'bold',
     },
     addCustomerButton: {
@@ -670,6 +764,13 @@ const createStylesheet = (theme: any, insets: any) =>
     addProjectText: {
       color: theme.colors.bodyBg,
       fontWeight: 'bold',
+    },
+    modalOverlay: {
+      flex: 1,
+      padding: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
   });
 
