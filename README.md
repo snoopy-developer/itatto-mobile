@@ -1,4 +1,4 @@
-# iTattoo Mobile Demo App
+# iTattoo Mobile App
 Welcome to the iTattoo Mobile App, a showcase mobile application built using React Native and Expo. This demo is designed to simulate the core functionality of a tattoo appointment booking system, enabling users to explore tattoo artists, manage bookings, and view upcoming appointments seamlessly on both iOS and Android platforms.
 
 ## ✨ Features
