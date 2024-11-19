@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import { FontAwesome } from '@expo/vector-icons';
 import MenuIcon from '@assets/images/svg/Menu.svg';
 import LeftIcon from '@assets/images/svg/LeftIcon.svg';
 import RightIcon from '@assets/images/svg/RightIcon.svg';
@@ -77,14 +76,12 @@ const PickHeader: React.FC<CalendarHeaderProps> = ({
         </TouchableOpacity>
         <SansText style={styles.dateText}>
           {viewMode === 'day' &&
-            focusedDate.getDate() +
-              ' ' +
-              months[focusedDate.getMonth()] +
-              ' ' +
-              focusedDate.getFullYear()}
+            `${focusedDate.getDate()} ${
+              months[focusedDate.getMonth()]
+            } ${focusedDate.getFullYear()}`}
           {viewMode === 'week' && getWeekRange(focusedDate)}
           {viewMode === 'month' &&
-            months[focusedDate.getMonth()] + ' ' + focusedDate.getFullYear()}
+            `${months[focusedDate.getMonth()]} ${focusedDate.getFullYear()}`}
         </SansText>
       </View>
       <View style={styles.viewSelector}>
@@ -151,18 +148,20 @@ function getWeekRange(date: Date) {
   startDate.setDate(date.getDate() - date.getDay());
   endDate.setDate(startDate.getDate() + 6);
 
-  const options = { day: 'numeric', month: 'short', year: 'numeric' } as const;
   const startDateFormatted = startDate.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
   });
-  const endDateFormatted = endDate.toLocaleDateString('en-US', options);
+  const endDateFormatted = endDate.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 
   if (startDate.getMonth() === endDate.getMonth()) {
     return `${startDate.getDate()} - ${endDateFormatted}`;
-  } else {
-    return `${startDateFormatted} - ${endDateFormatted}`;
   }
+  return `${startDateFormatted} - ${endDateFormatted}`;
 }
 
 const createStylesheet = (theme: any) =>

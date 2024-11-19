@@ -1,5 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Animated,
+} from 'react-native';
 import { useTheme } from 'styled-components/native';
 import { SansText } from '@components/StyledText';
 import { FontAwesome } from '@expo/vector-icons';
@@ -10,9 +16,6 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { fetchAppointments } from '@/redux/reducers/appointments';
 import { getCalendarBounds } from '@/helpers/timeHelper';
 import { useRouter } from 'expo-router';
-
-const massage = { key: 'massage', color: 'blue' };
-const workout = { key: 'workout', color: 'pink' };
 
 const LeftBar: React.FC = () => {
   const theme = useTheme();
@@ -26,20 +29,19 @@ const LeftBar: React.FC = () => {
   );
   const [previousFirstDay, setPreviousFirstDay] = useState<string | null>(null);
 
+  const [calendarKey, setCalendarKey] = useState(0); 
+
   const dispatch = useDispatch<AppDispatch>();
-
-  const { appointments, loading } = useSelector(
-    (state: RootState) => state.appointments,
-  );
-
+  const { appointments } = useSelector((state: RootState) => state.appointments);
   const { userProfile } = useSelector((state: RootState) => state.user);
+
+  const animatedOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const getAppointments = async () => {
       const { firstDay, lastDay } = getCalendarBounds(monthYearKey);
       if (firstDay !== previousFirstDay) {
         setPreviousFirstDay(firstDay);
-
         dispatch(
           fetchAppointments({
             from: firstDay,
@@ -59,17 +61,11 @@ const LeftBar: React.FC = () => {
 
   const markedDates = useMemo(() => {
     const dates: any = {};
-
-    if (appointments === null || appointments === undefined) return dates;
+    if (!appointments) return dates;
 
     appointments.forEach(
-      (appointment: { date: any; service: { name: string; color: any } }) => {
-        const date = appointment.date;
-        const serviceKey = appointment.service.name
-          .toLowerCase()
-          .replace(/\s/g, '_');
-        const serviceColor = appointment.service.color;
-
+      (appointment: { date: string; service: { name: string; color: string } }) => {
+        const { date, service } = appointment;
         if (!dates[date]) {
           dates[date] = {
             dots: [],
@@ -77,27 +73,39 @@ const LeftBar: React.FC = () => {
             selectedColor: theme.colors.primary,
           };
         }
-
         dates[date].dots.push({
-          key: serviceKey,
-          color: serviceColor,
+          key: service.name.toLowerCase().replace(/\s/g, '_'),
+          color: service.color,
         });
       },
     );
-
     return dates;
   }, [appointments, theme]);
 
-  const calendarKey = useMemo(() => theme.colors.bodyBg, [theme]);
+  useEffect(() => {
+    console.log('Theme changed:', theme.colors);
+
+    Animated.timing(animatedOpacity, {
+      toValue: 0, 
+      duration: 100,
+      useNativeDriver: true,
+    }).start(() => {
+      setCalendarKey((prevKey) => prevKey + 1);
+
+      Animated.timing(animatedOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [theme]);
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
           style={styles.buttonAddAppointment}
-          onPress={() => {
-            router.push('/calendar/calendarStash/addAppointmentModal');
-          }}
+          onPress={() => router.push('/calendar/calendarStash/addAppointmentModal')}
         >
           <FontAwesome name="plus" size={16} color={theme.colors.grayLight} />
           <SansText style={styles.buttonAddAppointmentText}>
@@ -106,15 +114,15 @@ const LeftBar: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.calendarContainer}>
+      <Animated.View
+        style={[styles.calendarContainer, { opacity: animatedOpacity }]}
+      >
         <Calendar
+          key={calendarKey} 
           initialDate={focusedDate.toISOString().slice(0, 10)}
-          // key={calendarKey}
-          onDayPress={(day: { dateString: string | number | Date }) =>
-            setFocusedDate(new Date(day.dateString))
-          }
+          onDayPress={(day) => setFocusedDate(new Date(day.dateString))}
           style={styles.calendar}
-          onVisibleMonthsChange={(months: [{ dateString: string }]) => {
+          onVisibleMonthsChange={(months) => {
             setMonthYearKey(months[0].dateString);
           }}
           theme={{
@@ -130,7 +138,7 @@ const LeftBar: React.FC = () => {
             selectedDayTextColor: '#ffffff',
             todayTextColor: '#00adf5',
           }}
-          markingType={'multi-dot'}
+          markingType="multi-dot"
           markedDates={{
             ...markedDates,
             [focusedDate.toISOString().slice(0, 10)]: {
@@ -139,7 +147,8 @@ const LeftBar: React.FC = () => {
             },
           }}
         />
-      </View>
+      </Animated.View>
+
       <View style={styles.filterContainer}>
         <ScrollView contentContainerStyle={styles.filterContainer}></ScrollView>
       </View>
@@ -152,8 +161,8 @@ const createStylesheet = (theme: any) =>
     container: {
       flexDirection: 'column',
       alignItems: 'center',
-      backgroundColor: theme.colors.bodyBg,
       flex: 1,
+      backgroundColor: theme.colors.bodyBg,
     },
     headerContainer: {
       paddingVertical: 16,
@@ -173,7 +182,6 @@ const createStylesheet = (theme: any) =>
     },
     calendar: {
       width: '100%',
-      backgroundColor: theme.colors.bodyBg,
     },
     filterContainer: {
       width: '100%',
